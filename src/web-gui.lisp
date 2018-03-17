@@ -44,13 +44,15 @@
                      (format t "~%<br>Quitting to menu.~%" nil)
                      (unless (equal *export* "n")
                       (export-missed (format nil "~a_~a.txt" "output"
-                                  (get-universal-time)))
-                      (setf *missed-words* nil))
+                                  (get-universal-time))))
                      (hunchentoot:redirect "/menu"))
                  ((check-n response) ; End of Line
                       (htm (:p  (format t "~%<br>You lose! You used a word that ends with \"~a\".
                         No words begin with \"~:*~a\", which makes a response impossible.~%" (car (gethash "n" *dicth*)))))
-                        (htm (:a :id "ok" :href (format nil "/menu" nil) " <br>OK")))
+                        (htm (:a :id "ok" :href (format nil "/menu" nil) " <br>OK"))
+                        (unless (equal *export* "n")
+                         (export-missed (format nil "~a_~a.txt" "output"
+                                     (get-universal-time)))))
                  ((not (equal "q" response))
                     (cond ((usedp response)
                             (format t "~%<br>You've already used that word.~%" nil))
@@ -132,7 +134,8 @@
           (call-mappr)
           ; Starting over, reset lists...
           (setf *corr-resp* nil
-                *wrong-resp* nil)
+                *wrong-resp* nil
+                *missed-words* nil)
           (hunchentoot:redirect "/get-word"))))))
 
 (hunchentoot:start *h*)
