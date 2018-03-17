@@ -1,5 +1,5 @@
 # cl-shiritori
-Common Lisp-based Shiritori word-chaining game.
+Common Lisp-based Shiritori word-chaining game, my first foray into the world of lisp(s), and a project for [CSC 458: Symbolic Programming](http://reed.cs.depaul.edu/peterh/class/csc458/), at DePaul University.
 
 Crude instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/) and [cl-who](https://common-lisp.net/~loliveira/ediware/cl-who/doc/).
 
