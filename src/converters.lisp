@@ -81,7 +81,7 @@
  (with-open-file (s p :if-does-not-exist nil
                       :external-format :utf-8)
    (let ((l (read s nil)))
-       (mapcar #'(lambda (x) (setf (gethash (car x) d) (cdr x))) l))))
+       (mapcar (lambda (x) (setf (gethash (car x) d) (cdr x))) l))))
 
 ; Create hash tables for letter-kana correspondences.
 (get-kana "/hiragana-grouped.txt" *dicth*)
@@ -91,8 +91,7 @@
   "Remove problematic 'n' mora results of roma->kana."
   (car (sort (remove-if #'null
               (mapcar (lambda (badp badv)
-          							(if (search (coerce badp 'string) s :test 'char=)
-          							(delete badv s :test #'char=)
-                        s))
+                              (if (search (coerce badp 'string) s :test 'char=)
+                                  (delete badv s :test #'char=) s))
           						badhp badhv))
-    #'(lambda (x y) (> (length x) (length y))))))
+    (lambda (x y) (> (length x) (length y))))))
