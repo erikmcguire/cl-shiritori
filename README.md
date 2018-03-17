@@ -1,5 +1,5 @@
 # cl-shiritori
-Common Lisp-based Shiritori word-chaining game.
+Common Lisp-based [*shiritori*](https://www.japantimes.co.jp/life/2017/01/16/language/shiritori-simple-game-thats-great-practicing-japanese-vocab/) word-chaining game.
 
 This is my first foray into the world of lisp(s), and a project for [CSC 458: Symbolic Programming](http://reed.cs.depaul.edu/peterh/class/csc458/), at DePaul University.
 
