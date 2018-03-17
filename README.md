@@ -13,4 +13,4 @@ Crude instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/)
 
 4. Visit http://localhost:5067/menu in your browser. You should see something like this:
 
-![Image](/assets/img/cls%20menu%20ss.png)
+![Image](https://erikmcguire.github.io/assets/img/cls%20menu%20ss.png)
