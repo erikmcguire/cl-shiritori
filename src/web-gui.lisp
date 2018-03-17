@@ -44,7 +44,8 @@
                      (format t "~%<br>Quitting to menu.~%" nil)
                      (unless (equal *export* "n")
                       (export-missed (format nil "~a_~a.txt" "output"
-                                  (get-universal-time))))
+                                  (get-universal-time)))
+                      (setf *missed-words* nil))
                      (hunchentoot:redirect "/menu"))
                  ((check-n response) ; End of Line
                       (htm (:p  (format t "~%<br>You lose! You used a word that ends with \"~a\".
