@@ -7,7 +7,7 @@
 (defparameter *all-kana* nil)
 (defparameter *all-kanji* nil)
 
-; Modified from: http://reed.cs.depaul.edu/peterh/class/csc458/ to take function (e.g., mapcar, maphash) as argument.
+; Mappr macro from: http://reed.cs.depaul.edu/peterh/class/csc458/ to take function (e.g., mapcar, maphash) as argument.
 
 (defmacro mappr (var args body colls)
   "Maps lambdas to collections."
