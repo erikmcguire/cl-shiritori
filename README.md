@@ -11,4 +11,6 @@ Crude instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/)
 
 3. Load the system: (asdf:load-system 'shiritori)
 
-4. Visit http://localhost:5067/menu in your browser.
+4. Visit http://localhost:5067/menu in your browser. You should see something like this:
+
+<p align="center"><img src="https://github.com/erikmcguire/cl-shiritori/blob/master/img/cls%20menu%20ss.png"></p>
