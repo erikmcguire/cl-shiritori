@@ -17,13 +17,12 @@
 (defparameter small-kana '(12419 12421 12423 12517 12519 12515)) ; ya yu yo
 (defparameter youon (mapcar (lambda (sk) (code-char sk)) small-kana))
 
-(defun cleanp (rsp d badp badv)
+(defun cleanp (rsp d)
   "Obtain a clean string from letter->kana functions."
   (setf cleanres
-    (cleanr badp badv
       (format nil "~{~a~}"
         (remove-if #'null
-          (roma->kana rsp d)))))
+          (roma->kana rsp d))))
   (if (not (equal "" cleanres))
     cleanres))
 
@@ -73,8 +72,8 @@
                               (equal response v)
                               (equal (concatenate 'string response (format nil "~a" (code-char 12377)) (format nil "~a" (code-char 12427))) v)) ; Add -suru for kana check.
                         (return t) nil)) *dict-all*))
-        *hira-resp* (cleanp response *dicth* badhp badhv) ; Convert to kana.
-        *kata-resp* (cleanp response *dictk* badkp badkv))
+        *hira-resp* (cleanp response *dicth*) ; Convert to kana.
+        *kata-resp* (cleanp response *dictk*))
     (if *hira-resp*
       (progn
         (setf hhr (format nil "~a" (elt *hira-resp* 0))

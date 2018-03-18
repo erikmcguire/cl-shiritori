@@ -10,20 +10,6 @@
         (if (not (equal (remove #\/ v) ""))
                 (setf *kana* (push (remove #\/ v) *kana*))))) *dict*))
 
-; These are variables for cleaning faulty "naa," "nii," &c. roma->kana results back into "na," "ni," etc.
-
-(setf badhv (mapcar #'code-char
-                     '(12354 12356 12358 12360 12362))
-      badkv (mapcar #'code-char (mapcar (lambda (x) (+ 96 x))
-                                       '(12354 12356 12358 12360 12362)))
-      hpairs '((12394 12354) (12395 12356)
-               (12396 12358) (12397 12360)
-               (12398 12362))
-      kpairs (mapcar (lambda (x) (mapcar (lambda (y) (+ 96 y)) x))
-                      hpairs)
-      badhp (mapcar (lambda (x) (mapcar #'code-char x)) hpairs)
-      badkp (mapcar (lambda (x) (mapcar #'code-char x)) kpairs))
-
 ; Using 96 as a difference to convert kana: a trick I came up with that seems to work...
 
 (defun kata->hira (word)
@@ -61,7 +47,8 @@
                        do (setf ss
                             (subseq s 0 (rem i (1+ (length s))))) ; Capture window.
                        when (gethash ss d) ; If there's a match...
-                         do (setf ls (length ss)) ; To recursively slide window.
+                         do (setf ls (length ss)
+                                  i (1- i)) ; To recursively slide window.
                        collect (car (gethash ss d))))))
              (rk-aux (s d)
                (incf cnt)
@@ -86,12 +73,3 @@
 ; Create hash tables for letter-kana correspondences.
 (get-kana "/hiragana-grouped.txt" *dicth*)
 (get-kana "/katakana-grouped.txt" *dictk*)
-
-(defun cleanr (badhp badhv s)
-  "Remove problematic 'n' mora results of roma->kana."
-  (car (sort (remove-if #'null
-              (mapcar (lambda (badp badv)
-                              (if (search (coerce badp 'string) s :test 'char=)
-                                  (delete badv s :test #'char=) s))
-          						badhp badhv))
-    (lambda (x y) (> (length x) (length y))))))
