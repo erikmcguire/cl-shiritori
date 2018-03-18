@@ -9,7 +9,7 @@ Crude instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/)
 
 2. Load the shiritori.asd file with something like Allegro CL.
 
-3. Load the system: (asdf:load-system 'shiritori) or [(ql:quickload](https://www.quicklisp.org/beta/) :shiritori)
+3. Load the system with [ASDF](https://common-lisp.net/project/asdf/) or [Quicklisp](https://www.quicklisp.org/beta/): `(asdf:load-system 'shiritori)` or `(ql:quickload :shiritori)`
 
 4. Visit http://localhost:5067/menu in your browser. You should see something like this:
 
