@@ -29,8 +29,11 @@
       collect (code-char (+ (char-code char) 96)))))
 
 (defun romajip (s)
-  "True if 0 non-letters present."
-  (and (every #'alphanumericp (coerce s 'list))
+  "True if 0 non-letters and 1 or more vowels present."
+  (and (remove-if #'zerop (mapcar (lambda (x)
+                                    (count x s))
+                                  (coerce "aiueo" 'list)))
+       (every #'alphanumericp (coerce s 'list))
        (notany #'null (mapcar (lambda (x) (< x 128))
                            (loop for char across s
                              collect (char-code char))))))
