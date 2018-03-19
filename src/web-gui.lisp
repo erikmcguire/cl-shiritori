@@ -18,9 +18,9 @@
     (:html :style "background-color: aliceblue;"
      (:head (:title "shiritori") (:meta :charset "utf-8"))
       (:body (:div :style "margin: 0 auto; width: 400px;"
-        (:p  (str *word*) (format t "~a <br>" (code-char 8594)))
+        (:p :lang "ja" (str *word*) " →<br>")
         (:form :method :post
-         (:input :autofocus "autofocus" :type :text :name "response" :value response)
+         (:input :id "respo" :autofocus "autofocus" :onfocus "this.select();" :type :text :name "response" :value response)
          (:input :type :submit :value "answer") (:br) (:br)
          (:fieldset (:legend "options")
            (:input :type :radio :name "user-in" :value "show" :onchange "this.form.submit();" "show <i>yomi</i>") (:br)
@@ -36,7 +36,7 @@
                    (hunchentoot:redirect "/get-word"))
                  ((and (equal response "show") ; Prompt w/ yomi if available.
                        (gethash *word* *dict-all*))
-                    (htm (:p  (format t "~%<br>~a~%" (gethash word *dict-all*)))))
+                    (htm (:p :lang "ja" (format t "~%<br>~a~%" (gethash word *dict-all*)))))
                  ((and (equal response "show")
                         (not (gethash *word* *dict-all*)))
                      (htm (:p  "<br>It's already <i>kana</i>!<br>")))
@@ -93,14 +93,16 @@
   (with-html-output-to-string (*standard-output* nil :prologue t :indent t)
     (:html :style "background-color: aliceblue;"
      (:head (:title "shiritori") (:meta :charset "utf-8"))
-      (:body (:h2 :align :center "尻取り (しりとり)")
-        (:p :style "margin: 0 auto; width: 40%; padding: 5px; border: 3px groove; font-family: georgia, sans-serif; font-size: 12;"
+      (:body (:h2 :lang "ja" :align :center "尻取り (しりとり)")
+        (:p :lang "ja" :style "margin: 0 auto; width: 40%; padding: 5px; border: 3px groove; font-family: georgia, sans-serif; font-size: 12;"
         "
            Welcome to a prototype Common Lisp implementation of the Japanese word-chaining game, <a href=\"https://www.japantimes.co.jp/life/2017/01/16/language/shiritori-simple-game-thats-great-practicing-japanese-vocab/\"><i>shiritori</i></a>.
 
              <br><br>When prompted with a word, respond with a word whose first syllable matches the final syllable of the prompt. For instance, if prompted with む<b>し</b>, respond with something like <b>し</b>る.
 
              <br><br>If the final grapheme of the reading is a <a href=\"https://en.wikipedia.org/wiki/Yōon\">small kana</a>, such as with 反射, or its kana form はん<b>しゃ</b>, match the final two kana in your response (e.g., <b>しゃ</b>ちょう).
+
+             <br><br>If the final grapheme is 'ー', such as with エレベータ<b>ー</b>, then match the kana before it (e.g., <b>タ</b>バコ).
 
              <br><br>The system can recognize <i>hiragana, katakana, kanji,</i> and <i>romaji</i> input.
 
