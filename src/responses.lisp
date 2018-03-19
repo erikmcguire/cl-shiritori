@@ -14,8 +14,7 @@
 (defparameter wordk-ix nil)
 (defparameter endw nil)
 (defparameter endr nil)
-(defparameter small-kana '(12419 12421 12423 12517 12519 12515)) ; ya yu yo
-(defparameter youon (mapcar (lambda (sk) (code-char sk)) small-kana))
+(defparameter youon '("ゃ" "ゅ" "ょ" "ャ" "ュ" "ョ"))
 
 (defun cleanp (rsp d)
   "Obtain a clean string from letter->kana functions."
@@ -35,6 +34,8 @@
     (setf endw (subseq kana-prompt (- (length kana-prompt) 2)))
     (if (find endw youon :test #'string=)
       (setf endw (subseq word (- (length word) 2)))))
+  (if (and (string= "ー" (elt (reverse word) 0)))
+    (setf endw (subseq (reverse word) 1 2)))
   (or
     (or
       (equal endw (car (gethash "n" *dicth*)))
@@ -70,7 +71,7 @@
         (block nil (maphash #'(lambda (k v)
                       (if (or (equal response k)
                               (equal response v)
-                              (equal (concatenate 'string response (format nil "~a" (code-char 12377)) (format nil "~a" (code-char 12427))) v)) ; Add -suru for kana check.
+                              (equal (concatenate 'string response "する") v))
                         (return t) nil)) *dict-all*))
         *hira-resp* (cleanp response *dicth*) ; Convert to kana.
         *kata-resp* (cleanp response *dictk*))
