@@ -118,17 +118,12 @@
         ; Check dictionary for prompts to chain response tail.
         ; Add discovered word when its head matches, for prompt.
         (block nil
-          (maphash #'(lambda (k v)
+          (remove-if #'null (mapcar #'(lambda (h)
                       (when
-                        (or
-                          (and v
-                               (not (equal "" v))
-                               (or (find (elt v 0) endr)
-                                   (find (elt v 0) thr)
-                                   (find (elt v 0) tkr)))
-                          (and (not (equal "" k))
-                               (find (elt k 0) endr)))
-                        (return k))) *dict*))))
+                        (or (find (elt h 0) endr)
+                            (find (elt h 0) thr)
+                            (find (elt h 0) tkr))
+                        (return h))) wdb)))))
 
 (defun set-wrong (response)
   "Saves incorrect response."
@@ -148,6 +143,8 @@
     (setf endr (format nil "~a" (elt (reverse response) 0))))
   (setf *hira-resp* nil ; Reset converted kana responses.
         *kata-resp* nil
+        thr nil
+        tkr nil
         word *word*
         l (length word)
         resp-ix (subseq response 0 1) ; Response 'head'.
