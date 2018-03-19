@@ -72,16 +72,14 @@
                       (if (or (equal response k)
                               (equal response v)
                               (equal (concatenate 'string response "する") v))
-                        (return t) nil)) *dict-all*))
-        *hira-resp* (cleanp response *dicth*) ; Convert to kana.
-        *kata-resp* (cleanp response *dictk*))
-    (if *hira-resp*
+                        (return t) nil)) *dict-all*)))
+    (if (setf *hira-resp* (cleanp response *dicth*)) ; Convert to hiragana.
       (progn
         (setf hhr (format nil "~a" (elt *hira-resp* 0))
               thr (format nil "~a" (elt (reverse *hira-resp*) 0))) ; Get converted response tails.
         (if (and (>= (length *hira-resp*) 2) (find (subseq *hira-resp* 1 2) youon :test #'string=))
           (setf hhr (subseq *hira-resp* 0 2)))))
-    (if *kata-resp*
+    (if (setf *kata-resp* (cleanp response *dictk*)) ; Convert to katakana.
       (progn
         (setf hkr (format nil "~a" (elt *kata-resp* 0))
               tkr (format nil "~a" (elt (reverse *kata-resp*) 0)))

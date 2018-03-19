@@ -26,10 +26,7 @@
            (:input :type :radio :name "user-in" :value "show" :onchange "this.form.submit();" "show <i>yomi</i>") (:br)
            (:input :type :radio :name "user-in" :value "skip" :onchange "this.form.submit();" "next word") (:br)
            (:input :type :radio :name "user-in" :value "q" :onchange "this.form.submit();" "quit to menu")))
-         (when
-           (or (equal user-in "show") (equal user-in "skip")
-               (equal user-in "q") response)
-           (setf response (or user-in response))
+         (when (setf response (or user-in response))
            (check-response response)
            (cond ((equal response "skip") ; Prompt skips to next word.
                    (setf *rhead* nil)
