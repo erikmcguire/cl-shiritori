@@ -1,6 +1,7 @@
 (in-package :shiritori)
 
 (defvar *h* (make-instance 'easy-acceptor :port 5067))
+
 (defparameter *user-opt* nil) ; Allow/forbid kanji word prompts.
 (defparameter *pos* nil) ; Allow/forbid -ru endings.
 (defparameter *word* nil) ; Word prompt: User supplies response.
