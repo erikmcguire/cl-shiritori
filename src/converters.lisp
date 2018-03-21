@@ -48,7 +48,8 @@
                 (car (remove-if #'null
                    (loop for i from 4 downto 1 ; Longest mapping is 4 graphemes.
                        do (setf ss
-                            (subseq s 0 (rem i (1+ (length s))))) ; Capture window.
+                            (subseq s 0 (rem i
+                                            (1+ (length s))))) ; Capture window.
                        when (gethash ss d) ; If there's a match...
                          do (setf ls (length ss)
                                   i (1- i)) ; To recursively slide window.
@@ -56,23 +57,13 @@
                (rk-aux (s d)
                  (incf cnt)
                    (let ((l (length s)))
-                     (cond ((or (> cnt (* l 24)) (not (romajip s))
-                                (null s)) nil)
-                           ((<= l ls) (gethash s d))
+                     (cond ((or
+                              (null s)
+                              (> cnt (* l 24))
+                              (and (not (equal "n" s))
+                                   (not (romajip s))))
+                              nil)
                            (t (cons (rk-loop s d)
                                     (rk-aux (subseq s ls l) d)))))))
       (or (gethash s d)
           (rk-aux s d))))))
-
-(defun get-kana (p d)
- "Obtain letter->kana Hepburn mappings from user-specified file."
- ; Hepburn mappings modified from:
- ; https://github.com/mhagiwara/nltk/blob/master/jpbook/romkan.py."
- (with-open-file (s p :if-does-not-exist nil
-                      :external-format :utf-8)
-   (let ((l (read s nil)))
-       (mapcar (lambda (x) (setf (gethash (car x) d) (cdr x))) l))))
-
-; Create hash tables for letter-kana correspondences.
-(get-kana "/hiragana-grouped.txt" *dicth*)
-(get-kana "/katakana-grouped.txt" *dictk*)
