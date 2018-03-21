@@ -4,7 +4,7 @@
 (in-package :shiritori-system)
 
 (asdf:defsystem shiritori
-  :version "0.1"
+  :version "0.9"
   :author "Erik McGuire"
   :licence "GPL 3.0"
   :description "Shiritori"
@@ -12,10 +12,9 @@
   :depends-on (:hunchentoot :cl-who)
   :serial t
   :components ((:file "packages")
+               (:file "globals")
                (:file "web-gui")
                (:file "loader")
                (:file "converters")
                (:file "responses")
               ))
-
-; (asdf:load-system 'shiritori)
