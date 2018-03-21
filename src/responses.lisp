@@ -1,21 +1,5 @@
 (in-package :shiritori)
 
-(defparameter *hira-resp* nil)
-(defparameter *kata-resp* nil)
-(defparameter hrsp nil)
-(defparameter hhr "")
-(defparameter hkr "")
-(defparameter thr "")
-(defparameter tkr "")
-(defparameter resp-ix nil)
-(defparameter kresp-ix nil)
-(defparameter hresp-ix nil)
-(defparameter word-ix nil)
-(defparameter wordk-ix nil)
-(defparameter endw nil)
-(defparameter endr nil)
-(defparameter youon '("ゃ" "ゅ" "ょ" "ャ" "ュ" "ョ"))
-
 (defun cleanp (rsp d)
   "Obtain a clean string from letter->kana functions."
   (setf cleanres
@@ -25,33 +9,36 @@
   (if (not (equal "" cleanres))
     cleanres))
 
-(defun check-word (word)
-  "Check compliance with ending rules."
-  (if (setf kana-prompt (gethash word *dict-all*)) ; Get kana tail for non-romaji prompt.
-    (setf endw (format nil "~a" (elt (reverse kana-prompt) 0)))
-    (setf endw (format nil "~a" (elt (reverse word) 0))))
-  (if (and kana-prompt (find endw youon :test #'string=))
-    (setf endw (subseq kana-prompt (- (length kana-prompt) 2)))
-    (if (find endw youon :test #'string=)
-      (setf endw (subseq word (- (length word) 2)))))
+(defun get-prompt-tail (word)
+  "Set prompt tail to appropriate window."
+  (setf kanat-w (format nil "~a" (elt (reverse word) 0)))
+  (if (find kanat-w youon :test #'string=)
+    (setf kanat-w (subseq word (- (length word) 2))))
   (if (and (string= "ー" (elt (reverse word) 0)))
-    (setf endw (subseq (reverse word) 1 2)))
-  (or
+    (setf kanat-w (subseq (reverse word) 1 2)))
+  (setf kanat-w
+        (or (coerce (kata->hira kanat-w) 'list) ; If kata tail, then hira.
+            kanat-w)) ; Already hira.
+  (if (equal (type-of kanat-w) 'cons)
+    (setf kanat-w (coerce kanat-w 'string)))
+  kanat-w)
+
+(defun check-word (word)
+  "Set prompt tail, check compliance w/ ending rules."
+  (setf word (or (gethash word *dict-all*) ; If kanji, then kana.
+                 word)) ; Already kana.
+  (setf kanat-w (get-prompt-tail word))
     (or
-      (equal endw (car (gethash "n" *dicth*)))
-      (equal endw (car (gethash "n" *dictk*)))) ; Skip kana 'n' tails.
-    (and (or (equal *pos* "n") (equal *pos* "no")) ; Honor -ru tail prohibition.
-      (or
-        (equal endw (car (gethash "ru" *dicth*)))
-        (equal endw (car (gethash "ru" *dictk*)))))))
+      (equal kanat-w
+            (car (gethash "n" *dicth*))); Skip kana 'n' tails.
+      (and
+        (equal *pos* "n") ; Honor -ru tail prohibition.
+        (equal kanat-w
+              (car (gethash "ru" *dicth*))))))
 
 (defun check-n (response)
   "Check user compliance with 'n' rule."
-  (notevery #'null (mapcar (lambda (x) (equal x endr))
-                           (list
-                             (car (gethash "n" *dicth*))
-                             (car (gethash "n" *dictk*))
-                             "n"))))
+  (equal (get-response-tail response) (car (gethash "n" *dicth*))))
 
 (defun usedp (response)
   "True if response used before."
@@ -66,51 +53,30 @@
 
 (defun realwordp (response)
   "Check entire multi-script corpus for response."
-  (setf
-        *known-word*
+  (setf *known-word*
         (block nil (maphash #'(lambda (k v)
                       (if (or (equal response k)
                               (equal response v)
                               (equal (concatenate 'string response "する") v))
                         (return t) nil)) *dict-all*)))
-    (if (setf *hira-resp* (cleanp response *dicth*)) ; Convert to hiragana.
-      (progn
-        (setf hhr (format nil "~a" (elt *hira-resp* 0))
-              thr (format nil "~a" (elt (reverse *hira-resp*) 0))) ; Get converted response tails.
-        (if (and (>= (length *hira-resp*) 2) (find (subseq *hira-resp* 1 2) youon :test #'string=))
-          (setf hhr (subseq *hira-resp* 0 2)))))
-    (if (setf *kata-resp* (cleanp response *dictk*)) ; Convert to katakana.
-      (progn
-        (setf hkr (format nil "~a" (elt *kata-resp* 0))
-              tkr (format nil "~a" (elt (reverse *kata-resp*) 0)))
-        (if (and (>= (length *hira-resp*) 2) (find (subseq *kata-resp* 1 2) youon :test #'string=))
-          (setf hkr (subseq *kata-resp* 0 2)))))
     (or (notevery #'null
             (mapcar (lambda (x)
-              (member x (append *all-kana* *all-kanji*) :test 'equal)) (remove-if #'null (list response (hira->kata response)
-                                (kata->hira response) *hira-resp*
-                                *kata-resp* (hira->kata *hira-resp*) (kata->hira *kata-resp*)))))
+              (member x (append *all-kana* *all-kanji*) :test 'equal)) (remove-if #'null (list response (hira->kata response)))))
           *known-word*))
 
-(defun correctp ()
+(defun correctp (response word)
  "Prompt tail == response head."
- (setf matcha
-    (mapcar #'(lambda (x)
-                (or
-                  (and (not (equal "" word-ix)) (equal word-ix x))
-                  (and (not (equal "" x)) (equal x endw))
-                  (and (not (equal "" wordk-ix)) (equal wordk-ix x))))
-             (remove-if #'null
-               (list resp-ix hrsp hhr hkr hresp-ix kresp-ix))))
-  (not (every #'null matcha)))
+ (equal (get-prompt-tail word)
+        (get-response-head response)))
 
 (defun set-correct (response)
   "Saves correct response, searches for matching
    computer response."
-  (push
-    (list response *hira-resp* *kata-resp*) *corr-resp*)
-  (setf
-        *corr-resp*
+   (push
+     (list response
+          (gethash response *dict-all*))
+     *corr-resp*)
+  (setf *corr-resp*
         (mapcar (lambda (x)
           (remove-if #'null
             (remove-duplicates x :test 'equal))) *corr-resp*)
@@ -119,16 +85,15 @@
         ; Add discovered word when its head matches, for prompt.
         (block nil
           (remove-if #'null (mapcar #'(lambda (h)
-                      (when
-                        (or (find (elt h 0) endr)
-                            (find (elt h 0) thr)
-                            (find (elt h 0) tkr))
+                      (when (find (elt h 0) (get-response-tail response))
                         (return h))) wdb)))))
 
 (defun set-wrong (response)
   "Saves incorrect response."
   (push
-    (list response (gethash response *dict-all*) *hira-resp* *kata-resp*) *wrong-resp*)
+    (list response
+         (gethash response *dict-all*))
+    *wrong-resp*)
   (push *word* *missed-words*)
   (setf *missed-words* (remove-if #'null *missed-words*))
   (setf *wrong-resp*
@@ -136,27 +101,27 @@
       (remove-if #'null
         (remove-duplicates x :test 'equal))) *wrong-resp*)))
 
+(defun get-response-tail (response)
+  "Set tail for computer to match."
+  (setf kanat-kr (subseq (reverse response) 0 1))
+  (if (find kanat-kr youon :test #'string=) ; To match yōon.
+    (setf kanat-kr (subseq response (- (length response) 2))))
+  (if (string= "ー" (elt (reverse response) 0)) ; To match kana before dash.
+    (setf kanat-kr (subseq (reverse response) 1 2))))
+
+(defun get-response-head (response)
+  "Set response head to appropriate window."
+  (if (and (>= (length response) 2) ; Capture if yōon.
+           (find (subseq response 1 2) youon :test #'string=))
+    (setf hrsp (subseq response 0 2))
+  (setf hrsp (subseq response 0 1))))
+
 (defun check-response (response)
-  "Set up useful variables."
-  (if (setf kana-tail (gethash response *dict-all*)) ; Get kana tail for non-romaji response.
-    (setf endr (format nil "~a" (elt (reverse kana-tail) 0)))
-    (setf endr (format nil "~a" (elt (reverse response) 0))))
-  (setf *hira-resp* nil ; Reset converted kana responses.
-        *kata-resp* nil
-        thr nil
-        tkr nil
-        word *word*
-        l (length word)
-        resp-ix (subseq response 0 1) ; Response 'head'.
-        hresp-ix (kata->hira resp-ix)
-        kresp-ix (hira->kata resp-ix) ; Katakana version.
-        wordk-ix (subseq (gethash word *dict-all*) (- l 1)) ; Kanji-kana prompt tail (?)
-        word-ix (subseq word (- l 1))) ; Kanji prompt tail.
-  (if (setf kana-head (gethash response *dict-all*)) ; Get kana head for kanji/kana response.
-    (setf hrsp (format nil "~a" (elt kana-head 0)))
-    (setf hrsp (format nil "~a" (elt response 0))))
-  (if (and kana-head (>= (length kana-head) 2)
-      (find (subseq kana-head 1 2) youon :test #'string=))
-    (setf hrsp (subseq kana-head 0 2))
-    (if (and (>= (length response) 2) (find (subseq response 1 2) youon :test #'string=))
-      (setf hrsp (subseq response 0 2)))))
+  "Set response to hiragana, set head and tail."
+  (setf response (or (coerce (kata->hira response) 'list) ; If kata, set hira.
+                     (cleanp response *dicth*) ; If romaji, set hira.
+                     (gethash response *dict-all*) ; If kanji, set hira.
+                     response)) ; Already hira.
+  (if (equal (type-of response) 'cons)
+    (setf response (coerce response 'string)))
+  response)
