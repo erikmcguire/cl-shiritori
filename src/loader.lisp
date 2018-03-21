@@ -1,12 +1,5 @@
 (in-package :shiritori)
 
-(defparameter *n-all* "/jlpt-all.txt")
-(defparameter *dict-all* (make-hash-table :test 'equal))
-(defparameter *dicth* (make-hash-table :test 'equal)) ; letter(s)->hiragana
-(defparameter *dictk* (make-hash-table :test 'equal)) ; letter(s)->katakana
-(defparameter *all-kana* nil)
-(defparameter *all-kanji* nil)
-
 ; Mappr macro modified from: http://reed.cs.depaul.edu/peterh/class/csc458/ to take function (e.g., mapcar, maphash) as argument.
 
 (defmacro mappr (var args body colls)
@@ -58,3 +51,16 @@
                                 (format s "~a~%~^" k))))
                         *dict*))
             *missed-words*)))
+
+(defun get-kana (p d)
+ "Obtain letter->kana Hepburn mappings from user-specified file."
+ ; Hepburn mappings modified from:
+ ; https://github.com/mhagiwara/nltk/blob/master/jpbook/romkan.py."
+ (with-open-file (s p :if-does-not-exist nil
+                      :external-format :utf-8)
+   (let ((l (read s nil)))
+       (mapcar (lambda (x) (setf (gethash (car x) d) (cdr x))) l))))
+
+; Create hash tables for letter-kana correspondences.
+(get-kana "/hiragana-grouped.txt" *dicth*)
+(get-kana "/katakana-grouped.txt" *dictk*)
