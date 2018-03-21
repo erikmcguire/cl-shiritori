@@ -1,17 +1,5 @@
 (in-package :shiritori)
 
-(defvar *h* (make-instance 'easy-acceptor :port 5067))
-(defparameter *user-opt* nil) ; Allow/forbid kanji word prompts.
-(defparameter *pos* nil) ; Allow/forbid -ru endings.
-(defparameter *word* nil) ; Word prompt: User supplies response.
-(defparameter *rhead* nil) ; For computer chaining.
-(defparameter *dict* nil) ; Level-specific hash table.
-(defparameter *corr-resp* nil) ; Correct responses.
-(defparameter *wrong-resp* nil) ; Wrong response.
-(defparameter *missed-words* nil) ; Missed prompts.
-(defparameter *export* nil) ; Toggle export missed prompts.
-(defparameter *seen* nil) ; Avoid repeated prompts.
-
 (define-easy-handler (get-response :uri "/get-response") (user-in response)
   (setf (hunchentoot:content-type*) "text/html; charset=utf-8")
   (with-html-output-to-string (*standard-output* nil :prologue t :indent t)
@@ -27,7 +15,7 @@
            (:input :type :radio :name "user-in" :value "skip" :onchange "this.form.submit();" "next word") (:br)
            (:input :type :radio :name "user-in" :value "q" :onchange "this.form.submit();" "quit to menu")))
          (when (setf response (or user-in response))
-           (check-response response)
+           (setf answer (check-response response))
            (cond ((equal response "skip") ; Prompt skips to next word.
                    (setf *rhead* nil)
                    (hunchentoot:redirect "/get-word"))
@@ -43,24 +31,24 @@
                       (export-missed (format nil "~a_~a.txt" "output"
                                   (get-universal-time))))
                      (hunchentoot:redirect "/menu"))
-                 ((check-n response) ; End of Line
+                 ((check-n answer) ; End of Line
                      (htm (:p  (format t "~%<br>You lose! You used a word that ends with \"~a\".
                       No words begin with \"~:*~a\", which makes a response impossible.~%" (car (gethash "n" *dicth*)))))
                      (htm (:a :id "ok" :href (format nil "/menu" nil) " <br>OK"))
                      (unless (equal *export* "n")
                        (export-missed (format nil "~a_~a.txt" "output"
                                    (get-universal-time)))))
-                  ((usedp response)
+                  ((usedp answer)
                     (format t "~%<br>You've already used that word.~%" nil))
-                  ((not (realwordp response))
+                  ((not (realwordp answer))
                     (format t "~%<br>Word not in database, unable to verify.~%" nil))
-                 ((correctp)
+                 ((correctp answer *word*)
                     (format t "~%<br>Correct!~%" nil)
-                    (set-correct response)
+                    (set-correct answer)
                     (htm (:a :id "correct" :href (format nil "/get-word" nil) " <br>>>")))
-                 ((not (correctp))
+                 ((not (correctp answer *word*))
                     (format t "~%<br>Sorry, try again.~%" nil)
-                    (set-wrong response)))))))))
+                    (set-wrong answer)))))))))
 
 (define-easy-handler (get-word :uri "/get-word") ()
   (setf (hunchentoot:content-type*) "text/html; charset=utf-8")
