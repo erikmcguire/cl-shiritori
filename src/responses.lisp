@@ -18,15 +18,15 @@
     (setf kanat-w (subseq (reverse word) 1 2)))
   (setf kanat-w
         (or (coerce (kata->hira kanat-w) 'list) ; If kata tail, then hira.
-            kanat-w)) ; Already hira.
+             kanat-w)) ; Already hira.
   (if (equal (type-of kanat-w) 'cons)
     (setf kanat-w (coerce kanat-w 'string)))
   kanat-w)
 
 (defun check-word (word)
-  "Set prompt tail, check compliance w/ ending rules."
+  "Check compliance w/ ending rules."
   (setf word (or (gethash word *dict-all*) ; If kanji, then kana.
-                 word)) ; Already kana.
+                  word)) ; Already kana.
   (setf kanat-w (get-prompt-tail word))
     (or
       (equal kanat-w
@@ -38,7 +38,8 @@
 
 (defun check-n (response)
   "Check user compliance with 'n' rule."
-  (equal (get-response-tail response) (car (gethash "n" *dicth*))))
+  (equal (get-response-tail response)
+         (car (gethash "n" *dicth*))))
 
 (defun usedp (response)
   "True if response used before."
@@ -107,7 +108,8 @@
   (if (find kanat-kr youon :test #'string=) ; To match yōon.
     (setf kanat-kr (subseq response (- (length response) 2))))
   (if (string= "ー" (elt (reverse response) 0)) ; To match kana before dash.
-    (setf kanat-kr (subseq (reverse response) 1 2))))
+    (setf kanat-kr (subseq (reverse response) 1 2)))
+  kanat-kr)
 
 (defun get-response-head (response)
   "Set response head to appropriate window."
@@ -117,7 +119,7 @@
   (setf hrsp (subseq response 0 1))))
 
 (defun check-response (response)
-  "Set response to hiragana, set head and tail."
+  "Set response to hiragana."
   (setf response (or (coerce (kata->hira response) 'list) ; If kata, set hira.
                      (cleanp response *dicth*) ; If romaji, set hira.
                      (gethash response *dict-all*) ; If kanji, set hira.
