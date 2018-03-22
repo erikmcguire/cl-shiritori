@@ -45,7 +45,7 @@
           (cnt 0))
       (labels ((rk-loop (s d)
                 "Collect possible kana values for romaji."
-                (car (remove-if #'null
+                (car (last (remove-if #'null
                    (loop for i from 4 downto 1 ; Longest mapping is 4 graphemes.
                        do (setf ss
                             (subseq s 0 (rem i
@@ -53,15 +53,14 @@
                        when (gethash ss d) ; If there's a match...
                          do (setf ls (length ss)
                                   i (1- i)) ; To recursively slide window.
-                       collect (car (gethash ss d))))))
+                       collect (car (gethash ss d)))))))
                (rk-aux (s d)
                  (incf cnt)
                    (let ((l (length s)))
                      (cond ((or
                               (null s)
                               (> cnt (* l 24))
-                              (and (not (equal "n" s))
-                                   (not (romajip s))))
+                              (and (not (equal "n" s)) (not (romajip s))))
                               nil)
                            (t (cons (rk-loop s d)
                                     (rk-aux (subseq s ls l) d)))))))
