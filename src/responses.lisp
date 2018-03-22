@@ -11,6 +11,8 @@
 
 (defun get-prompt-tail (word)
   "Set prompt tail to appropriate window."
+  (setf word (or (gethash word *dict-all*) ; If kanji, then kana.
+                  word)) ; Already kana.
   (setf kanat-w (format nil "~a" (elt (reverse word) 0)))
   (if (find kanat-w youon :test #'string=)
     (setf kanat-w (subseq word (- (length word) 2))))
@@ -25,8 +27,6 @@
 
 (defun check-word (word)
   "Check compliance w/ ending rules."
-  (setf word (or (gethash word *dict-all*) ; If kanji, then kana.
-                  word)) ; Already kana.
   (setf kanat-w (get-prompt-tail word))
     (or
       (equal kanat-w
