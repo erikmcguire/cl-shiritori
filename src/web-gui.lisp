@@ -21,7 +21,7 @@
                    (hunchentoot:redirect "/get-word"))
                  ((and (equal response "show") ; Prompt w/ yomi if available.
                        (gethash *word* *dict-all*))
-                    (htm (:p :lang "ja" (format t "~%<br>~a~%" (gethash word *dict-all*)))))
+                    (htm (:p :lang "ja" (format t "~%<br>~a~%" (gethash *word* *dict-all*)))))
                  ((and (equal response "show")
                         (not (gethash *word* *dict-all*)))
                      (htm (:p  "<br>It's already <i>kana</i>!<br>")))
