@@ -96,7 +96,7 @@
          (gethash response *dict-all*))
     *wrong-resp*)
   (push *word* *missed-words*)
-  (setf *missed-words* (remove-if #'null *missed-words*))
+  (setf *missed-words* (remove-if #'null (remove-duplicates *missed-words* :test 'equal)))
   (setf *wrong-resp*
     (mapcar (lambda (x)
       (remove-if #'null
@@ -123,7 +123,7 @@
   (setf response (or (coerce (kata->hira response) 'list) ; If kata, set hira.
                      (cleanp response *dicth*) ; If romaji, set hira.
                      (gethash response *dict-all*) ; If kanji, set hira.
-                     response)) ; Already hira.
+                      response)) ; Already hira.
   (if (equal (type-of response) 'cons)
     (setf response (coerce response 'string)))
   response)
