@@ -3,7 +3,7 @@ Common Lisp-based [*shiritori*](https://www.japantimes.co.jp/life/2017/01/16/lan
 
 This is my first foray into the world of lisp(s), and a project for [CSC 458: Symbolic Programming](http://reed.cs.depaul.edu/peterh/class/csc458/), at DePaul University. As this was intended, at this stage, as an educational activity, note especially that the functions for converting scripts were custom built from zero, the most challenging element there being the function for converting romaji input (e.g., *inaka*) into kana (e.g., いなか). Future versions will likely use pre-existing conversion tools.
 
-Crude instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/) and [cl-who](https://common-lisp.net/~loliveira/ediware/cl-who/doc/).
+Quick instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/) and [cl-who](https://common-lisp.net/~loliveira/ediware/cl-who/doc/).
 
 1. Place .txt files contained in the datasets directory to a default lisp location--for me it's "C:\\". 
 
@@ -13,7 +13,7 @@ Crude instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/)
 
 4. Visit http://localhost:5067/menu in your browser. You should see something like this:
 
-![Image](https://erikmcguire.github.io/assets/img/cls%20menu%20ss.png)
+![Image](https://erikmcguire.github.io/assets/img/cls menu ss.png)
 
 This activity is useful for learners of Japanese to practice their productive and receptive vocabulary skills. It is also touted as a [creativity](http://tedtalkspsychology.com/play-this-game-to-come-up-with-original-ideas-with-shimpei-takahashi/) tool, and is used in neuroscientific experiments for a range of purposes (Shimomura, et al., [2008](https://goo.gl/1R8bSW); Kashida, et al., [2016](https://goo.gl/He7Fau); Kato, et al., [2017](https://goo.gl/3sgZZJ)).
 
