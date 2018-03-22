@@ -4,16 +4,21 @@
   (setf (hunchentoot:content-type*) "text/html; charset=utf-8")
   (with-html-output-to-string (*standard-output* nil :prologue t :indent t)
     (:html :style "background-color: aliceblue;"
-     (:head (:title "shiritori") (:meta :charset "utf-8"))
+     (:head (:title "shiritori") (:meta :charset "utf-8")) (:h1 "<br>")
       (:body (:div :style "margin: 0 auto; width: 400px;"
-        (:p :lang "ja" (str *word*) " →<br>")
-        (:form :method :post
-         (:input :id "respo" :autofocus "autofocus" :onfocus "this.select();" :type :text :name "response" :value response)
-         (:input :type :submit :value "answer") (:br) (:br)
-         (:fieldset (:legend "options")
-           (:input :type :radio :name "user-in" :value "show" :onchange "this.form.submit();" "show <i>yomi</i>") (:br)
-           (:input :type :radio :name "user-in" :value "skip" :onchange "this.form.submit();" "next word") (:br)
-           (:input :type :radio :name "user-in" :value "q" :onchange "this.form.submit();" "quit to menu")))
+        (:form :method :post :align "center"
+          (:label :lang "ja" :for "respo" (str *word*) " →&nbsp; ")
+          (:input :id "respo"
+           :autofocus "autofocus"
+           :onfocus "this.select();"
+           :type :text
+           :name "response" :value response)
+          (:input :type :submit :value "answer") (:br) (:br)
+          (:div :id "feedback" :style "margin: 0 auto; width: 400px;")
+          (:fieldset (:legend "options")
+            (:input :type :submit :name "user-in" :value "show" :onchange "this.form.submit();")
+            (:input :type :submit :name "user-in" :value "skip" :onchange "this.form.submit();")
+            (:input :type :submit :name "user-in" :value "quit" :onchange "this.form.submit();")))
          (when (setf response (or user-in response))
            (setf answer (check-response response))
            (cond ((equal response "skip") ; Prompt skips to next word.
@@ -21,33 +26,46 @@
                    (hunchentoot:redirect "/get-word"))
                  ((and (equal response "show") ; Prompt w/ yomi if available.
                        (gethash *word* *dict-all*))
-                    (htm (:p :lang "ja" (format t "~%<br>~a~%" (gethash *word* *dict-all*)))))
+                   (htm (:script
+                         :type "text/javascript"
+                         "document.getElementById(\"feedback\").innerHTML = '<p lang=ja>" (str (gethash *word* *dict-all*)) "</p><br>';")))
                  ((and (equal response "show")
                         (not (gethash *word* *dict-all*)))
-                     (htm (:p  "<br>It's already <i>kana</i>!<br>")))
-                 ((equal "q" response)
-                     (format t "~%<br>Quitting to menu.~%" nil)
+                        (htm (:script
+                              :type "text/javascript"
+                              "document.getElementById(\"feedback\").innerHTML = 'It\\'s already <i>kana</i>!<br><br>';")))
+                 ((equal "quit" response)
+                     (htm (:script
+                           :type "text/javascript"
+                           "document.getElementById(\"feedback\").innerHTML = 'Quitting to menu.<br><br>';"))
                      (unless (equal *export* "n")
                       (export-missed (format nil "~a_~a.txt" "output"
                                   (get-universal-time))))
                      (hunchentoot:redirect "/menu"))
                  ((check-n answer) ; End of Line
-                     (htm (:p  (format t "~%<br>You lose! You used a word that ends with \"~a\".
-                      No words begin with \"~:*~a\", which makes a response impossible.~%" (car (gethash "n" *dicth*)))))
-                     (htm (:a :id "ok" :href (format nil "/menu" nil) " <br>OK"))
+                     (htm (:script
+                           :type "text/javascript"
+                           "document.getElementById(\"feedback\").innerHTML = 'You lose! You used a word that ends with ん. No word begins with ん, which makes a response impossible.<br><a href=/menu>OK</a><br><br>';"))
                      (unless (equal *export* "n")
                        (export-missed (format nil "~a_~a.txt" "output"
                                    (get-universal-time)))))
                   ((usedp answer)
-                    (format t "~%<br>You've already used that word.~%" nil))
+                    (htm (:script
+                          :type "text/javascript"
+                          "document.getElementById(\"feedback\").innerHTML = 'You\\'ve already used that word.<br><br>';")))
                   ((not (realwordp answer))
-                    (format t "~%<br>Word not in database, unable to verify.~%" nil))
+                    (htm (:script
+                          :type "text/javascript"
+                          "document.getElementById(\"feedback\").innerHTML = 'Word not in database, unable to verify.<br><br>';")))
                  ((correctp answer *word*)
-                    (format t "~%<br>Correct!~%" nil)
                     (set-correct answer)
-                    (htm (:a :id "correct" :href (format nil "/get-word" nil) " <br>>>")))
+                    (htm (:script
+                          :type "text/javascript"
+                          "document.getElementById(\"feedback\").innerHTML = 'Correct!<br><a href=/get-word>>></a><br><br>';")))
                  ((not (correctp answer *word*))
-                    (format t "~%<br>Sorry, try again.~%" nil)
+                    (htm (:script
+                          :type "text/javascript"
+                          "document.getElementById(\"feedback\").innerHTML = 'Sorry, try again.<br><br>';"))
                     (set-wrong answer)))))))))
 
 (define-easy-handler (get-word :uri "/get-word") ()
