@@ -22,50 +22,34 @@
          (when (setf response (or user-in response))
            (setf answer (check-response response))
            (cond ((equal response "skip") ; Prompt skips to next word.
-                   (setf *rhead* nil)
-                   (hunchentoot:redirect "/get-word"))
+                    (setf *rhead* nil)
+                    (hunchentoot:redirect "/get-word"))
                  ((and (equal response "show") ; Prompt w/ yomi if available.
                        (gethash *word* *dict-all*))
-                   (htm (:script
-                         :type "text/javascript"
-                         "document.getElementById(\"feedback\").innerHTML = '<p lang=ja>" (str (gethash *word* *dict-all*)) "</p><br>';")))
+                       (feedback "<p lang=ja>" (str (gethash *word* *dict-all*)) "</p><br>';"))
                  ((and (equal response "show")
-                        (not (gethash *word* *dict-all*)))
-                        (htm (:script
-                              :type "text/javascript"
-                              "document.getElementById(\"feedback\").innerHTML = 'It\\'s already <i>kana</i>!<br><br>';")))
+                       (not (gethash *word* *dict-all*)))
+                       (feedback "It\\'s already <i>kana</i>!"))
                  ((equal "quit" response)
-                     (htm (:script
-                           :type "text/javascript"
-                           "document.getElementById(\"feedback\").innerHTML = 'Quitting to menu.<br><br>';"))
+                     (feedback "Quitting to menu.")
                      (unless (equal *export* "n")
                       (export-missed (format nil "~a_~a.txt" "output"
                                   (get-universal-time))))
                      (hunchentoot:redirect "/menu"))
-                 ((check-n answer) ; End of Line
-                     (htm (:script
-                           :type "text/javascript"
-                           "document.getElementById(\"feedback\").innerHTML = 'You lose! You used a word that ends with ん. No word begins with ん, which makes a response impossible.<br><a href=/menu>OK</a><br><br>';"))
+                 ((checkn answer) ; End of Line
+                     (feedback "You lose! You used a word that ends with ん. No word begins with ん, which makes a response impossible.<br><br><a href=/menu>OK</a>")
                      (unless (equal *export* "n")
-                       (export-missed (format nil "~a_~a.txt" "output"
-                                   (get-universal-time)))))
+                       (export-missed
+                           (format nil "~a_~a.txt"
+                                       "output" (get-universal-time)))))
                   ((usedp answer)
-                    (htm (:script
-                          :type "text/javascript"
-                          "document.getElementById(\"feedback\").innerHTML = 'You\\'ve already used that word.<br><br>';")))
+                    (feedback "You\\'ve already used that word."))
                   ((not (realwordp answer))
-                    (htm (:script
-                          :type "text/javascript"
-                          "document.getElementById(\"feedback\").innerHTML = 'Word not in database, unable to verify.<br><br>';")))
+                    (feedback "Word not in database, unable to verify."))
                  ((correctp answer *word*)
                     (set-correct answer)
-                    (htm (:script
-                          :type "text/javascript"
-                          "document.getElementById(\"feedback\").innerHTML = 'Correct!<br><a href=/get-word>>></a><br><br>';")))
-                 ((not (correctp answer *word*))
-                    (htm (:script
-                          :type "text/javascript"
-                          "document.getElementById(\"feedback\").innerHTML = 'Sorry, try again.<br><br>';"))
+                    (feedback "Correct!<br><br><a href=/get-word>>></a>"))
+                 (t (feedback "Sorry, try again.")
                     (set-wrong answer)))))))))
 
 (define-easy-handler (get-word :uri "/get-word") ()
@@ -74,21 +58,7 @@
     (:html
      (:head (:title "shiritori") (:meta :charset "utf-8"))
       (:body
-         (when *pos*
-           (if *rhead* ; Computer player continues chain.
-             (setf *word* *rhead*)
-             (setf *word* nil))
-           (if (not (equal *user-opt* "n"))
-             (setf wdb *kanji*)
-             (setf wdb *kana*))
-           (if (or (member *word* *seen*) (null *word*)) ; Pick random word to start fresh.
-             (setf *word* (elt wdb (random (length wdb)))))
-          (loop while (check-word *word*)
-            do (setf *word* (elt wdb (random (length wdb)))))
-              ; Get new word if and until rules not violated.
-           (if (not (member *word* *seen*))
-             (push *word* *seen*))
-           (hunchentoot:redirect "/get-response"))))))
+         (get-word)))))
 
 (define-easy-handler (menu :uri "/menu") (pos level exmissed akanji)
   (setf (hunchentoot:content-type*) "text/html; charset='utf-8'")
