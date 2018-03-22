@@ -3,7 +3,7 @@ Common Lisp-based [*shiritori*](https://www.japantimes.co.jp/life/2017/01/16/lan
 
 This is my first foray into the world of lisp(s), and a project for [CSC 458: Symbolic Programming](http://reed.cs.depaul.edu/peterh/class/csc458/), at DePaul University. As this was intended, at this stage, as an educational activity, note especially that the functions for converting scripts were custom built from zero, the most challenging element there being the function for converting romaji input (e.g., *inaka*) into kana (e.g., いなか). Future versions will likely use pre-existing conversion tools.
 
-Crude instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/) and [cl-who](https://common-lisp.net/~loliveira/ediware/cl-who/doc/).
+Quick instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/) and [cl-who](https://common-lisp.net/~loliveira/ediware/cl-who/doc/).
 
 1. Place .txt files contained in the datasets directory to a default lisp location--for me it's "C:\\". 
 
