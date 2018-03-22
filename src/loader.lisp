@@ -8,6 +8,31 @@
               ,@body)
             ,colls))
 
+(defmacro feedback (s)
+  `(htm (:script
+         :type "text/javascript"
+         "document.getElementById(\"feedback\").innerHTML ='" ,s "<br><br>';")))
+
+(defun user-import (p d &optional (dl "	"))
+  "Import delimited file into hash-table and lists.
+   Tab-delimited by default."
+  (with-open-file (s p :if-does-not-exist nil
+                       :external-format :utf-8)
+  (loop for l = (read-line s nil)
+    while l
+      do (let ((headword
+                  (remove-if-not (lambda (x) (alphanumericp x))
+                                 (subseq l 0 (search dl l))))
+              (yomi
+                  (remove-if-not (lambda (x) (alphanumericp x))
+                                 (subseq l (search dl l)))))
+            (setf (gethash headword d) yomi)
+            (setf *user-hw*
+                  (remove-duplicates (push headword *user-hw*) :test 'equal)
+                  *user-rd*
+                  (remove-duplicates (push headword *user-rd*) :test 'equal)))
+   )))
+
 (defun get-words (p d)
   "Obtain list of words from user-specified file."
   (with-open-file (s p :if-does-not-exist nil
@@ -52,15 +77,12 @@
                         *dict*))
             *missed-words*)))
 
-(defun get-kana (p d)
- "Obtain letter->kana Hepburn mappings from user-specified file."
+(defun get-kana (d l)
+ "Obtain letter->kana Hepburn mappings."
  ; Hepburn mappings modified from:
  ; https://github.com/mhagiwara/nltk/blob/master/jpbook/romkan.py."
- (with-open-file (s p :if-does-not-exist nil
-                      :external-format :utf-8)
-   (let ((l (read s nil)))
-       (mapcar (lambda (x) (setf (gethash (car x) d) (cdr x))) l))))
+ (mapcar (lambda (x) (setf (gethash (car x) d) (cdr x))) l))
 
 ; Create hash tables for letter-kana correspondences.
-(get-kana "/hiragana-grouped.txt" *dicth*)
-(get-kana "/katakana-grouped.txt" *dictk*)
+(get-kana *dicth* *hiragana-map*)
+(get-kana *dictk* *katakana-map*)
