@@ -84,7 +84,7 @@
          <br><br>You may set a time limit for each prompt-response pair, between 1-20 seconds (5s by default).
          <br><br>If enabled, after quitting to menu, you can find exported file(s) in your default lisp folder
          (e.g., 'C\:\\acl10.1express\\'), named output_[universal_time].txt, or in an existing directory path of your choosing.
-         <br><br>Vocabulary data is from public Japanese Language Proficiency Test <a href=https://en.wiktionary.org/wiki/Appendix:JLPT>lists</a>.
+         <br><br>Word data are from public Japanese Language Proficiency Test <a href=https://en.wiktionary.org/wiki/Appendix:JLPT>lists</a>.
          <br><br>You may enter the path to a custom import file, also: by default, the .txt or .csv should be tab-delimited
           with two columns: kanji word form and kana form; you can also use comma-delimited (e.g., on a given line: 漢字,かんじ).")
        (:br)
