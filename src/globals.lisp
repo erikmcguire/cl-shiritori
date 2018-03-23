@@ -14,6 +14,13 @@
 (defparameter *wrong-resp* nil) ; Wrong response.
 (defparameter *missed-words* nil) ; Missed prompts.
 (defparameter *export* nil) ; Toggle export missed prompts.
+(defparameter *expath* (let ((prefix ""))
+                        (lambda (&optional (x))
+                          (format nil "~a~a_~a.txt"
+                            (setf prefix (or x prefix))
+                            "output"
+                            (get-universal-time))))) ; Export path.
+
 (defparameter *seen* nil) ; Avoid repeated prompts.
 
 (defparameter *n-all* "/jlpt-all.txt")
