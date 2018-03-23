@@ -4,7 +4,7 @@
 (in-package :shiritori-system)
 
 (asdf:defsystem shiritori
-  :version "0.9"
+  :version "1.0"
   :author "Erik McGuire"
   :licence "GPL 3.0"
   :description "Shiritori"
