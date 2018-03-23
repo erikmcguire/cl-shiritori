@@ -39,7 +39,7 @@
                              collect (char-code char))))))
 
 (defun roma->kana (s d)
-  "Recursively get kana for longest romaji n-grams."
+  "Convert romaji to kana."
   (when (or (gethash s d) (> (length s) 1))
     (let ((ls 0)
           (cnt 0))
@@ -55,6 +55,7 @@
                                   i (1- i)) ; To recursively slide window.
                        collect (car (gethash ss d)))))))
                (rk-aux (s d)
+                 "Recursively get kana for longest romaji n-grams."
                  (incf cnt)
                    (let ((l (length s)))
                      (cond ((or
@@ -63,6 +64,14 @@
                               (and (not (equal "n" s)) (not (romajip s))))
                               nil)
                            (t (cons (rk-loop s d)
-                                    (rk-aux (subseq s ls l) d)))))))
-      (or (gethash s d)
-          (rk-aux s d))))))
+                                    (rk-aux (subseq s ls l) d))))))
+               (cleanr (s d)
+                 "Obtain a clean string from roma->kana output."
+                 (let ((cleanres
+                   (format nil "~{~a~}"
+                     (remove-if #'null
+                     (or (gethash s d)
+                         (rk-aux s d))))))
+                 (unless (equal "" cleanres)
+                   cleanres))))
+      (cleanr s d)))))
