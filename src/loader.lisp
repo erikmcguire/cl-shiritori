@@ -8,35 +8,9 @@
               ,@body)
             ,colls))
 
-(defmacro feedback (s)
-  `(htm (:script
-         :type "text/javascript"
-         "document.getElementById(\"feedback\").innerHTML ='" ,s "<br><br>';")))
-
-(defun user-import (p d &optional (dl "	"))
-  "Import delimited file into hash-table and lists.
-   Tab-delimited by default."
-  (with-open-file (s p :if-does-not-exist nil
-                       :external-format :utf-8)
-  (loop for l = (read-line s nil)
-    while l
-      do (let ((headword
-                  (remove-if-not (lambda (x) (alphanumericp x))
-                                 (subseq l 0 (search dl l))))
-              (yomi
-                  (remove-if-not (lambda (x) (alphanumericp x))
-                                 (subseq l (search dl l)))))
-            (setf (gethash headword d) yomi)
-            (setf *user-hw*
-                  (remove-duplicates (push headword *user-hw*) :test 'equal)
-                  *user-rd*
-                  (remove-duplicates (push headword *user-rd*) :test 'equal)))
-   )))
-
 (defun get-words (p d)
-  "Obtain list of words from user-specified file."
-  (with-open-file (s p :if-does-not-exist nil
-                       :external-format :utf-8)
+  "Obtain list of words from file."
+  (with-open-file (s p :external-format :utf-8)
     (loop for l = (read-line s nil)
         while l
         do (if (null (search " " l))
@@ -52,6 +26,28 @@
 ; For checking legitimate words in corpus.
 
 (defparameter *all-words* (get-words *n-all* *dict-all*))
+
+(defun user-import (p d &optional (dl "	"))
+  "Import delimited file into hash-table and lists.
+   Tab-delimited by default."
+  (with-open-file (s p :external-format :utf-8)
+  (loop for l = (read-line s nil)
+    while l
+      do (let ((headword
+                  (remove-if-not (lambda (x) (alphanumericp x))
+                                 (subseq l 0 (search dl l))))
+              (yomi
+                  (remove-if-not (lambda (x) (alphanumericp x))
+                                 (subseq l (search dl l)))))
+            (setf (gethash headword d) yomi)
+            (setf *kanji*
+                  (remove-duplicates (push headword *kanji*) :test 'equal)
+                  *kana*
+                  (remove-duplicates (push headword *kana*) :test 'equal))
+            (push headword *all-kanji*)
+            (setf (gethash headword *dict-all*) yomi)
+            (push yomi *all-kana*))
+   )))
 
 (mappr 'maphash (k v)
   ((when v (if (equal "" v)
