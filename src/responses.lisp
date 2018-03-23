@@ -3,18 +3,35 @@
 (defun get-prompt-tail (word)
   "Set prompt tail to appropriate window."
   (setf word (or (gethash word *dict-all*) ; If kanji, then kana.
-                  word)) ; Already kana.
-  (setf kanat-w (format nil "~a" (elt (reverse word) 0)))
-  (if (find kanat-w youon :test #'string=)
-    (setf kanat-w (subseq word (- (length word) 2))))
+                 (consol word); If kata, then hira.
+                  word) ; Else hira.
+        kanat-w (or (youonp word)
+                    (longvp word)
+                    (format nil "~a"
+                                (elt (reverse word) 0)))))
+
+(defun longvp (word)
+  "If word ends with dash, adjust tail."
   (if (and (string= "ー" (elt (reverse word) 0)))
-    (setf kanat-w (subseq (reverse word) 1 2)))
-  (setf kanat-w
-        (or (coerce (kata->hira kanat-w) 'list) ; If kata tail, then hira.
-             kanat-w)) ; Already hira.
-  (if (equal (type-of kanat-w) 'cons)
-    (setf kanat-w (coerce kanat-w 'string)))
-  kanat-w)
+    (setf longv (subseq (reverse word) 1 2))
+    (setf longv nil))
+  longv)
+
+(defun youonp (word)
+  "Get longer tail for youon endings."
+  (if (find (elt (reverse word) 0) youon :test #'string=)
+    (setf youons (subseq word (- (length word) 2)))
+    (setf youons nil))
+  youons)
+
+(defun consol (s)
+  "Convert katakana to hiragana or leave as-is."
+  (let ((s (or (coerce (kata->hira s) 'list)
+                s)))
+  (if (equal (type-of s) 'cons)
+    (setf conss (coerce s 'string))
+    (setf conss nil))
+  conss))
 
 (defun get-word ()
   (when *pos*
@@ -89,7 +106,7 @@
         ; Add discovered word when its head matches, for prompt.
         (block nil
           (remove-if #'null (mapcar #'(lambda (h)
-                      (when (find (elt h 0) (get-response-tail response))
+                      (when (and (not (check-word h)) (find (elt h 0) (get-response-tail response)))
                         (return h))) wdb)))))
 
 (defun set-wrong (response)
@@ -106,12 +123,9 @@
 
 (defun get-response-tail (response)
   "Set tail for computer to match."
-  (setf kanat-kr (subseq (reverse response) 0 1))
-  (if (find kanat-kr youon :test #'string=) ; To match yōon.
-    (setf kanat-kr (subseq response (- (length response) 2))))
-  (if (string= "ー" (elt (reverse response) 0)) ; To match kana before dash.
-    (setf kanat-kr (subseq (reverse response) 1 2)))
-  kanat-kr)
+  (setf kanat-kr (or (youonp response)
+                     (longvp response)
+                     (subseq (reverse response) 0 1))))
 
 (defun get-response-head (response)
   "Set response head to appropriate window."
