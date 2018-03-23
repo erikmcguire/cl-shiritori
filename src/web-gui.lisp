@@ -114,9 +114,9 @@
                 *kana* nil
                 *kanji* nil
                 *dict* (make-hash-table :test 'equal))
-          (cond ((and delimiter custom)
+          (cond ((and delimiter (> (length custom) 0))
                   (user-import (str custom) *dict* ","))
-                (custom
+                ((> (length custom) 0)
                   (user-import (str custom) *dict*))
                 (t
                   (get-words (concatenate 'string "/jlpt" (string-downcase (str level)) ".txt") *dict*)
