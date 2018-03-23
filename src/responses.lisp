@@ -1,5 +1,9 @@
 (in-package :shiritori)
 
+(defun check-time (tm &optional (lm *lm*))
+   (>= (* (/ (- (get-internal-real-time) tm)
+          internal-time-units-per-second) .1) lm))
+
 (defun get-prompt-tail (word)
   "Set prompt tail to appropriate window."
   (setf word (or (gethash word *dict-all*) ; If kanji, then kana.
@@ -12,7 +16,7 @@
 
 (defun longvp (word)
   "If word ends with dash, adjust tail."
-  (if (and (string= "ー" (elt (reverse word) 0)))
+  (if (string= "ー" (elt (reverse word) 0))
     (setf longv (subseq (reverse word) 1 2))
     (setf longv nil))
   longv)
@@ -44,8 +48,10 @@
    ; Get new word if and until rules not violated.
    (loop while (check-word *word*)
     do (setf *word* (elt wdb (random (length wdb)))))
-    (push *word* *seen*)
-    (hunchentoot:redirect "/get-response")))
+   (push *word* *seen*)
+   (when *tlm*
+     (setf thyme (get-internal-real-time)))
+   (hunchentoot:redirect "/get-response")))
 
 (defun check-word (word)
   "Check compliance w/ ending rules."
@@ -136,8 +142,12 @@
 
 (defun check-response (response)
   "Set response to hiragana."
-  (setf response (or (gethash response *dict-all*) ; If kanji, then hira.
-                     (consol response) ; If kata, then hira.
-                     (roma->kana response *dicth*) ; If romaji, set hira.
-                      response)) ; Else hira.
+  (if (and *tlm* (check-time thyme))
+    (setf exceeded "exceeded")
+    (setf exceeded nil))
+  (setf response (or exceeded ; Time's up.
+                    (gethash response *dict-all*) ; If kanji, then hira.
+                    (consol response) ; If kata, then hira.
+                    (roma->kana response *dicth*) ; If romaji, set hira.
+                     response)) ; Else hira.
   response)

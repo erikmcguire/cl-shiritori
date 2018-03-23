@@ -2,6 +2,9 @@
 
 (defvar *h* (make-instance 'easy-acceptor :port 5067))
 
+(defparameter thyme nil) ; Set current time after prompt shown.
+(defparameter *tlm* nil) ; Toggle time limit.
+(defparameter *lm* .0) ; Numerical limit.
 (defparameter *user-opt* nil) ; Allow/forbid kanji word prompts.
 (defparameter *pos* nil) ; Allow/forbid -ru endings.
 (defparameter *word* nil) ; Word prompt: User supplies response.
