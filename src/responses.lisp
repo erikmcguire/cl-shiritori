@@ -2,7 +2,7 @@
 
 (defun check-time (tm &optional (lm *lm*))
    (>= (* (/ (- (get-internal-real-time) tm)
-          internal-time-units-per-second) .1) lm))
+          internal-time-units-per-second) 1.0) lm))
 
 (defun get-prompt-tail (word)
   "Set prompt tail to appropriate window."
