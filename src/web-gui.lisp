@@ -38,8 +38,7 @@
                  ((equal "quit" response)
                      (feedback "Quitting to menu.")
                      (unless (equal *export* "n")
-                      (export-missed (format nil "~a_~a.txt" "output"
-                                  (get-universal-time))))
+                      (export-missed (funcall *expath*)))
                      (hunchentoot:redirect "/menu"))
                  ((equal "exceeded" answer)
                    (feedback "Sorry, you ran out of time!<br><br><a href=/menu>OK</a>"))
@@ -47,8 +46,7 @@
                      (feedback "You lose! You used a word that ends with ん. No word begins with ん, which makes a response impossible.<br><br><a href=/menu>OK</a>")
                      (unless (equal *export* "n")
                        (export-missed
-                           (format nil "~a_~a.txt"
-                                       "output" (get-universal-time)))))
+                           (funcall *expath*))))
                   ((usedp answer)
                     (feedback "You\\'ve already used that word."))
                   ((not (realwordp answer))
@@ -67,7 +65,7 @@
       (:body
          (get-word)))))
 
-(define-easy-handler (menu :uri "/menu") (pos level exmissed akanji custom delimiter tlm lm)
+(define-easy-handler (menu :uri "/menu") (pos level exmissed akanji custom delimiter tlm lm expath)
   (setf (hunchentoot:content-type*) "text/html; charset='utf-8'")
   (with-html-output-to-string (*standard-output* nil :prologue t :indent t)
     (:html :style "background-color: aliceblue;"
@@ -85,7 +83,9 @@
 
              <br><br>The system can recognize <i>hiragana, katakana, kanji,</i> and <i>romaji</i> input.
 
-             <br><br>If enabled, after quitting to menu, you can find exported file(s) in your default lisp folder (e.g., 'C\:\\acl10.1express\\'), named output_[universal_time].txt.
+             <br><br>You may set a time limit for each prompt-response pair, between 1-20 seconds (5s by default).
+
+             <br><br>If enabled, after quitting to menu, you can find exported file(s) in your default lisp folder (e.g., 'C\:\\acl10.1express\\'), named output_[universal_time].txt, or in a path of your choosing--make sure the entered directory exists.
 
              <br><br>Vocabulary data, for now, is from Wiktionary's <a href=\"https://en.wiktionary.org/wiki/Appendix:JLPT\">lists</a>.
 
@@ -98,22 +98,25 @@
            (loop for ulvl in '("N5" "N4" "N3" "N2" "N1")
              do (htm (:option :value level (str ulvl)))))
          (:label :for "level" " JLPT level") (:br) (:br)
-         (:input :type :checkbox :id "exp" :name "exmissed" :value exmissed)
-         (:label :for "exp" "export missed") (:br)
          (:input :type :checkbox :id "kmode" :name "akanji" :value akanji)
          (:label :for "kmode" "allow <i>kanji</i> prompts") (:br)
          (:input :type :checkbox :id "ru" :name "pos" :value pos)
          (:label :for "ru" "allow <i>-ru</i> endings") (:br)
          (:input :type :checkbox :id "tlm" :name "tlm" :value tlm)
          (:label :for "tlm" "limit time")
-         (:input :type :number :min ".1" :max "0.9" :step ".1" :style "width: 3em;" :value lm :name "lm" :placeholder "0.5") (:br)
+         (:input :type :number :min "1.0" :max "20.0" :step "1.0" :style "width: 2.5em;" :value lm :name "lm" :placeholder "5s") (:br) (:br)
+         (:input :type :checkbox :id "exp" :name "exmissed" :value exmissed)
+         (:label :for "exp" "export missed") (:br)
          (:input :type :checkbox :id "delim" :name "delimiter" :value delimiter)
-         (:label :for "delim" "comma-delimited") (:br) (:br)
+         (:label :for "delim" "comma-delimited import") (:br) (:br)
          (:label :for "imp" "Import path: ")
-         (:input :type :text :id "imp" :name "custom" :value custom :placeholder "C\:\\import.txt") (:br)) (:br)
+         (:input :type :text :id "imp" :name "custom" :value custom :placeholder "C\:\\import.txt") (:br)
+         (:label :for "expp" "Export path: ")
+         (:input :type :text :id "expp" :name "expath" :value expath :placeholder "C\:\\export_lists\\") (:br)) (:br)
          (:div :style "text-align: center;" (:input :type :submit :value "start the game"))))
         (when level
-          (when (equal "" lm) (setf lm "0.5"))
+          (when (equal "" lm)
+            (setf lm "5.0"))
           (setf *pos* (or pos "n")
                 *user-opt* (or (str akanji) "n")
                 *export* (or (str exmissed) "n")
@@ -122,6 +125,7 @@
                 *kana* nil
                 *kanji* nil
                 *dict* (make-hash-table :test 'equal))
+          (funcall *expath* (str expath))
           (cond ((and delimiter (> (length custom) 0))
                   (user-import (str custom) *dict* ","))
                 ((> (length custom) 0)
