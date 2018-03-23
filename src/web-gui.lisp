@@ -20,7 +20,7 @@
            :name "response" :value response)
           (:input :type :submit :value "answer") (:br) (:br)
           (:div :id "feedback" :style "margin: 0 auto; width: 400px;")
-          (:fieldset (:legend "options")
+          (:fieldset :style "font-family: georgia, sans-serif; font-size: 12;" (:legend "options")
             (:input :type :submit :name "user-in" :value "show" :onchange "this.form.submit();")
             (:input :type :submit :name "user-in" :value "skip" :onchange "this.form.submit();")
             (:input :type :submit :name "user-in" :value "quit" :onchange "this.form.submit();")))
@@ -89,7 +89,7 @@
 
              <br><br>You may enter the full path (e.g., 'C\:\\import.txt') to a custom import file, also: by default, the .txt or .csv should be tab-delimited with two columns: kanji word form and kana form; you can also use comma-delimited (e.g., on a given line: 漢字,かんじ).")
        (:br)
-       (:div :style "margin: 0 auto; width: 30%;"
+       (:div :style "margin: 0 auto; width: 30%; font-family: georgia, sans-serif; font-size: 12;"
        (:form :method :post
          (:fieldset (:legend "options")
          (:select :autofocus "autofocus" :id "level" :name "level"
