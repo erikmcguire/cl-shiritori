@@ -1,5 +1,10 @@
 (in-package :shiritori)
 
+(defmacro feedback (s)
+  `(htm (:script
+         :type "text/javascript"
+         "document.getElementById(\"feedback\").innerHTML ='" ,s "<br><br>';")))
+
 (define-easy-handler (get-response :uri "/get-response") (user-in response)
   (setf (hunchentoot:content-type*) "text/html; charset=utf-8")
   (with-html-output-to-string (*standard-output* nil :prologue t :indent t)
@@ -26,7 +31,7 @@
                     (hunchentoot:redirect "/get-word"))
                  ((and (equal response "show") ; Prompt w/ yomi if available.
                        (gethash *word* *dict-all*))
-                       (feedback "<p lang=ja>" (str (gethash *word* *dict-all*)) "</p><br>';"))
+                       (feedback (concatenate 'string "<p lang=ja>" (str (gethash *word* *dict-all*)) "</p><br>';")))
                  ((and (equal response "show")
                        (not (gethash *word* *dict-all*)))
                        (feedback "It\\'s already <i>kana</i>!"))
@@ -60,7 +65,7 @@
       (:body
          (get-word)))))
 
-(define-easy-handler (menu :uri "/menu") (pos level exmissed akanji)
+(define-easy-handler (menu :uri "/menu") (pos level exmissed akanji custom delimiter)
   (setf (hunchentoot:content-type*) "text/html; charset='utf-8'")
   (with-html-output-to-string (*standard-output* nil :prologue t :indent t)
     (:html :style "background-color: aliceblue;"
@@ -80,9 +85,11 @@
 
              <br><br>If enabled, after quitting to menu, you can find exported file(s) in your default lisp folder (e.g., 'C\:\\acl10.1express\\'), named output_[universal_time].txt.
 
-             <br><br>Vocabulary data, for now, is from Wiktionary's <a href=\"https://en.wiktionary.org/wiki/Appendix:JLPT\">lists</a>.")
+             <br><br>Vocabulary data, for now, is from Wiktionary's <a href=\"https://en.wiktionary.org/wiki/Appendix:JLPT\">lists</a>.
+
+             <br><br>You may enter the full path (e.g., 'C\:\\import.txt') to a custom import file, also: by default, the .txt or .csv should be tab-delimited with two columns: kanji word form and kana form; you can also use comma-delimited (e.g., on a given line: 漢字,かんじ).")
        (:br)
-       (:div :style "margin: 0 auto; width: 20%;"
+       (:div :style "margin: 0 auto; width: 30%;"
        (:form :method :post
          (:fieldset (:legend "options")
          (:select :autofocus "autofocus" :id "level" :name "level"
@@ -94,18 +101,26 @@
          (:input :type :checkbox :id "kmode" :name "akanji" :value akanji)
          (:label :for "kmode" "allow <i>kanji</i> prompts") (:br)
          (:input :type :checkbox :id "ru" :name "pos" :value pos)
-         (:label :for "ru" "allow <i>-ru</i> endings")) (:br)
+         (:label :for "ru" "allow <i>-ru</i> endings") (:br)
+         (:input :type :checkbox :id "delim" :name "delimiter" :value delimiter)
+         (:label :for "delim" "comma-delimited") (:br) (:br)
+         (:label :for "imp" "Import path: ")
+         (:input :type :text :id "imp" :name "custom" :value custom) (:br)) (:br)
          (:div :style "text-align: center;" (:input :type :submit :value "start the game"))))
         (when level
           (setf *pos* (or pos "n")
                 *user-opt* (or (str akanji) "n")
                 *export* (or (str exmissed) "n")
-                user-level (string-downcase (str level))
                 *kana* nil
                 *kanji* nil
                 *dict* (make-hash-table :test 'equal))
-          (get-words (concatenate 'string "/jlpt" user-level ".txt") *dict*)
-          (call-mappr)
+          (cond ((and delimiter custom)
+                  (user-import (str custom) *dict* ","))
+                (custom
+                  (user-import (str custom) *dict*))
+                (t
+                  (get-words (concatenate 'string "/jlpt" (string-downcase (str level)) ".txt") *dict*)
+                  (call-mappr)))
           ; Starting over, reset lists...
           (setf *corr-resp* nil
                 *wrong-resp* nil
