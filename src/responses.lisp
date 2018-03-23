@@ -136,10 +136,8 @@
 
 (defun check-response (response)
   "Set response to hiragana."
-  (setf response (or (coerce (kata->hira response) 'list) ; If kata, set hira.
+  (setf response (or (gethash response *dict-all*) ; If kanji, then hira.
+                     (consol response) ; If kata, then hira.
                      (roma->kana response *dicth*) ; If romaji, set hira.
-                     (gethash response *dict-all*) ; If kanji, set hira.
-                      response)) ; Already hira.
-  (if (equal (type-of response) 'cons)
-    (setf response (coerce response 'string)))
+                      response)) ; Else hira.
   response)
