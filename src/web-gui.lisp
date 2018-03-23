@@ -41,6 +41,8 @@
                       (export-missed (format nil "~a_~a.txt" "output"
                                   (get-universal-time))))
                      (hunchentoot:redirect "/menu"))
+                 ((equal "exceeded" answer)
+                   (feedback "Sorry, you ran out of time!<br><br><a href=/menu>OK</a>"))
                  ((checkn answer) ; End of Line
                      (feedback "You lose! You used a word that ends with ん. No word begins with ん, which makes a response impossible.<br><br><a href=/menu>OK</a>")
                      (unless (equal *export* "n")
@@ -65,7 +67,7 @@
       (:body
          (get-word)))))
 
-(define-easy-handler (menu :uri "/menu") (pos level exmissed akanji custom delimiter)
+(define-easy-handler (menu :uri "/menu") (pos level exmissed akanji custom delimiter tlm lm)
   (setf (hunchentoot:content-type*) "text/html; charset='utf-8'")
   (with-html-output-to-string (*standard-output* nil :prologue t :indent t)
     (:html :style "background-color: aliceblue;"
@@ -87,7 +89,7 @@
 
              <br><br>Vocabulary data, for now, is from Wiktionary's <a href=\"https://en.wiktionary.org/wiki/Appendix:JLPT\">lists</a>.
 
-             <br><br>You may enter the full path (e.g., 'C\:\\import.txt') to a custom import file, also: by default, the .txt or .csv should be tab-delimited with two columns: kanji word form and kana form; you can also use comma-delimited (e.g., on a given line: 漢字,かんじ).")
+             <br><br>You may enter the path to a custom import file, also: by default, the .txt or .csv should be tab-delimited with two columns: kanji word form and kana form; you can also use comma-delimited (e.g., on a given line: 漢字,かんじ).")
        (:br)
        (:div :style "margin: 0 auto; width: 30%; font-family: georgia, sans-serif; font-size: 12;"
        (:form :method :post
@@ -102,15 +104,21 @@
          (:label :for "kmode" "allow <i>kanji</i> prompts") (:br)
          (:input :type :checkbox :id "ru" :name "pos" :value pos)
          (:label :for "ru" "allow <i>-ru</i> endings") (:br)
+         (:input :type :checkbox :id "tlm" :name "tlm" :value tlm)
+         (:label :for "tlm" "limit time")
+         (:input :type :number :min ".1" :max "0.9" :step ".1" :style "width: 3em;" :value lm :name "lm" :placeholder "0.5") (:br)
          (:input :type :checkbox :id "delim" :name "delimiter" :value delimiter)
          (:label :for "delim" "comma-delimited") (:br) (:br)
          (:label :for "imp" "Import path: ")
-         (:input :type :text :id "imp" :name "custom" :value custom) (:br)) (:br)
+         (:input :type :text :id "imp" :name "custom" :value custom :placeholder "C\:\\import.txt") (:br)) (:br)
          (:div :style "text-align: center;" (:input :type :submit :value "start the game"))))
         (when level
+          (when (equal "" lm) (setf lm "0.5"))
           (setf *pos* (or pos "n")
                 *user-opt* (or (str akanji) "n")
                 *export* (or (str exmissed) "n")
+                *tlm* tlm
+                *lm* (or (read-from-string lm))
                 *kana* nil
                 *kanji* nil
                 *dict* (make-hash-table :test 'equal))
