@@ -11,7 +11,7 @@
   :long-description "Common Lisp implementation of the Japanese word-chaining game, shiritori."
   :depends-on (:hunchentoot :cl-who)
   :serial t
-  :components ((:file "packages")
+  :components ((:file "package")
                (:file "globals")
                (:file "web-gui")
                (:file "loader")
