@@ -1,7 +1,7 @@
 # cl-shiritori
 Common Lisp-based [*shiritori*](https://www.japantimes.co.jp/life/2017/01/16/language/shiritori-simple-game-thats-great-practicing-japanese-vocab/) word-chaining game.
 
-This is my first foray into the world of lisp(s), and a project for [CSC 458: Symbolic Programming](http://reed.cs.depaul.edu/peterh/class/csc458/), at DePaul University. As this was intended, at this stage, as an educational activity, note especially that the functions for converting scripts were custom built from zero, the most challenging element there being the function for converting romaji input (e.g., *inaka*) into kana (e.g., いなか). Future versions will likely use pre-existing conversion tools.
+This is my first foray into the world of lisp(s), and a project for [CSC 458: Symbolic Programming](http://reed.cs.depaul.edu/peterh/class/csc458/), at DePaul University. As this was intended, at this stage, as an educational activity, note especially that the functions for converting scripts were custom built from zero, the most challenging element there being the function for converting romaji input (e.g., *inaka*) into kana (e.g., いなか),  with recursion, &c., rather than with something like [CL-PPCRE](https://edicl.github.io/cl-ppcre/) for regular expressions. Future versions will likely use pre-existing conversion tools, and the current version uses two key prefab components for the browser-based GUI, as noted below:
 
 Quick instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/) and [cl-who](https://common-lisp.net/~loliveira/ediware/cl-who/doc/).
 
@@ -20,3 +20,5 @@ This activity is useful for learners of Japanese to practice their productive an
 This early, simple version of the game is intended primarily for my own education in working with Lisp, although I hope to render it into an [open](http://www.xinhuanet.com/english/2017-06/04/c_136338015.htm), accessible tool for [researchers](https://www.nature.com/news/why-scientists-must-share-their-research-code-1.20504) of various [backgrounds](https://www.nature.com/nature/journal/v541/n7638/full/nj7638-563a.html) and language learners, along with versions containing additional features: more robust import and export functionality, interface localization into Japanese, Chinese and Korean support, parts-of-speech filtering, a measure of gamification (via a progress bar, time limits for what Paul Nation calls '[fluency](https://profesorbaker.wordpress.com/2011/04/02/dr-paul-nation-explains-the-4-3-2-fluency-activity/)' exercises, and scoring \[perhaps with multiple AI players\]), audio, and chains involving the morphemes that kanji represent.
 
 I am partial to offline tools which do not rely on the caprices of website availability, but accessing online dictionaries via API is another feature to consider.
+
+Datasets provided by [Wiktionary](https://en.wiktionary.org/wiki/Appendix:JLPT) [(CC BY-SA 3.0)](https://creativecommons.org/licenses/by-sa/3.0/).
