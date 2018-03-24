@@ -4,7 +4,7 @@
 
 (defparameter thyme nil) ; Set current time after prompt shown.
 (defparameter *tlm* nil) ; Toggle time limit.
-(defparameter *lm* .0) ; Numerical limit.
+(defparameter *lm* 5.0) ; Numerical limit.
 (defparameter *user-opt* nil) ; Allow/forbid kanji word prompts.
 (defparameter *pos* nil) ; Allow/forbid -ru endings.
 (defparameter *word* nil) ; Word prompt: User supplies response.
@@ -30,9 +30,9 @@
 (defparameter *all-kana* nil)
 (defparameter *all-kanji* nil)
 
-(defparameter youon '("ゃ" "ゅ" "ょ" "ャ" "ュ" "ョ"))
+(defvar youon '("ゃ" "ゅ" "ょ" "ャ" "ュ" "ョ"))
 
-(defparameter *hiragana-map* '(("je" "じぇ") ("cche" "っちぇ") ("che" "ちぇ") ("-" "ー") ("dyi" "でぃ") ("n" "ん") ("wo" "を") ("we" "ゑ") ("wi" "ゐ")
+(defvar *hiragana-map* '(("je" "じぇ") ("cche" "っちぇ") ("che" "ちぇ") ("-" "ー") ("dyi" "でぃ") ("n" "ん") ("wo" "を") ("we" "ゑ") ("wi" "ゐ")
  ("wa" "わ") ("xwa" "ゎ") ("ro" "ろ") ("re" "れ") ("ru" "る") ("ryo" "りょ") ("ryu" "りゅ") ("rya" "りゃ") ("ri" "り")
  ("ra" "ら") ("yo" "よ") ("xyo" "ょ") ("yu" "ゆ") ("xyu" "ゅ") ("ya" "や") ("xya" "ゃ") ("mo" "も") ("me" "め")
  ("mu" "む") ("myo" "みょ") ("myu" "みゅ") ("mya" "みゃ") ("mi" "み") ("ma" "ま") ("po" "ぽ") ("bo" "ぼ") ("ho" "ほ")
@@ -62,7 +62,7 @@
  ("ka" "か") ("o" "お") ("xo" "ぉ") ("e" "え") ("xe" "ぇ") ("vo" "う゛ぉ") ("ve" "う゛ぇ") ("vi" "う゛ぃ") ("va" "う゛ぁ")
  ("vu" "う゛") ("u" "う") ("xu" "ぅ") ("i" "い") ("xi" "ぃ") ("a" "あ") ("xa" "ぁ")))
 
- (defparameter *katakana-map* '(("je" "ジェ") ("cche" "ッチェ") ("che" "チェ") ("-" "ー") ("di" "ディ") ("n" "ン") ("wo" "ウォ") ("wo" "ヲ") ("we" "ウェ")
+ (defvar *katakana-map* '(("je" "ジェ") ("cche" "ッチェ") ("che" "チェ") ("-" "ー") ("di" "ディ") ("n" "ン") ("wo" "ウォ") ("wo" "ヲ") ("we" "ウェ")
  ("we" "ヱ") ("wi" "ヰ") ("wi" "ウィ") ("wa" "ワ") ("xwa" "ヮ") ("ro" "ロ") ("re" "レ") ("ru" "ル") ("ryo" "リョ")
  ("ryu" "リュ") ("rya" "リャ") ("ri" "リ") ("ra" "ラ") ("yo" "ヨ") ("xyo" "ョ") ("yu" "ユ") ("xyu" "ュ") ("ya" "ヤ")
  ("xya" "ャ") ("mo" "モ") ("me" "メ") ("mu" "ム") ("myo" "ミョ") ("myu" "ミュ") ("mya" "ミャ") ("mi" "ミ") ("ma" "マ")
