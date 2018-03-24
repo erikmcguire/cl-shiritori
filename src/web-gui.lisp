@@ -87,7 +87,9 @@
          <br><br>Word data are from public Japanese Language Proficiency Test
           <a href=https://en.wiktionary.org/wiki/Appendix:JLPT>lists</a>.
          <br><br>You may enter the path to a custom import file, also: by default, the .txt or .csv should be tab-delimited
-          with two columns: kanji word form and kana form; you can also use comma-delimited (e.g., on a given line: 漢字,かんじ).")
+          with two columns: kanji word form and kana form; you can also use comma-delimited (e.g., on a given line: 漢字,かんじ).
+          If selected, the import list will be used for prompts.
+          To verify if a response is a real word, the system checks the combined import and JLPT lists.")
        (:br)
        (:div :style "margin: 0 auto; width: 30%; font-family: georgia, sans-serif; font-size: 12;"
        (:form :method :post
