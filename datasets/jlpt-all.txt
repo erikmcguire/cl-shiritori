@@ -199,7 +199,7 @@
 レンタカー -hire car (lit: rent-a-car)
 レントゲン -X-ray (lit: Roentgen)
 ロープ -rope
-ローマ字, ローマじ -romanization, Roman letters
+ローマ字, ろーまじ -romanization, Roman letters
 ロマンチック -romantic
 ワット -watt
 嗚呼, ああ -Ah!, Oh!, Alas!
@@ -5287,7 +5287,6 @@ NAME?
 連合, れんごう -union,alliance
 レンズ -lens
 蝋燭, ろうそく -candle
-ローマじ -romanization,Roman letters
 録音, ろくおん -(audio) recording
 ロッカー -locker
 ロビー -lobby
