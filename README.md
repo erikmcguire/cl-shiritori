@@ -13,7 +13,7 @@ Quick instructions--you need [Hunchentoot](https://edicl.github.io/hunchentoot/)
 
 4. Visit http://localhost:5067/menu in your browser. You should see something like this:
 
-![Image](https://erikmcguire.github.io/assets/img/cls%20menu%20ss.png)
+![Image](https://erikmcguire.github.io/assets/img/cls%20menu%20ss.png) 
 
 This activity is useful for learners of Japanese to practice their productive and receptive vocabulary skills. It is also touted as a [creativity](http://tedtalkspsychology.com/play-this-game-to-come-up-with-original-ideas-with-shimpei-takahashi/) tool, and is used in neuroscientific experiments for a range of purposes (Shimomura, et al., [2008](https://goo.gl/1R8bSW); Kashida, et al., [2016](https://goo.gl/He7Fau); Kato, et al., [2017](https://goo.gl/3sgZZJ)).
 
