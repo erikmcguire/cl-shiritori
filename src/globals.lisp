@@ -23,12 +23,9 @@
 
 (defparameter *seen* nil) ; Avoid repeated prompts.
 
-(defparameter *n-all* "/jlpt-all.txt")
 (defparameter *dict-all* (make-hash-table :test 'equal))
 (defparameter *dicth* (make-hash-table :test 'equal)) ; letter(s)->hiragana
 (defparameter *dictk* (make-hash-table :test 'equal)) ; letter(s)->katakana
-(defparameter *all-kana* nil)
-(defparameter *all-kanji* nil)
 
 (defvar youon '("ゃ" "ゅ" "ょ" "ャ" "ュ" "ョ"))
 

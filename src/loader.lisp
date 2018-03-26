@@ -19,13 +19,11 @@
         do (setf subl (subseq l 0 spsl))
           when (>= (length (remove #\, subl)) 2)
             do (setf (gethash (remove #\, subl) d)
-                     (string-trim '(#\/ #\space) (subseq l (search " " l) (search " -" l))))
-          when (>= (length (remove #\, subl)) 2)
-            collect (remove #\, subl))))
+                     (string-trim '(#\/ #\space) (subseq l (search " " l) (search " -" l)))))))
 
 ; For checking legitimate words in corpus.
 
-(defparameter *all-words* (get-words *n-all* *dict-all*))
+(get-words "/jlpt-all.txt" *dict-all*)
 
 (defun user-import (p d &optional (dl "	"))
   "Import delimited file into hash-table and lists.
@@ -44,20 +42,13 @@
                   (remove-duplicates (push headword *kanji*) :test 'equal)
                   *kana*
                   (remove-duplicates (push headword *kana*) :test 'equal))
-            (push headword *all-kanji*)
-            (setf (gethash headword *dict-all*) yomi)
-            (push yomi *all-kana*))
+            (setf (gethash headword *dict-all*) yomi))
    )))
 
 (mappr 'maphash (k v)
   ((when v (if (equal "" v)
     (setf (gethash k *dict-all*) nil))))
   *dict-all*)
-
-(mappr 'maphash (k v)
-  ((setf *all-kanji* (push k *all-kanji*))
-    (when v (if (not (equal v ""))
-        (setf *all-kana* (push v *all-kana*))))) *dict-all*)
 
 (defun export-missed (p)
   "Export missed words to tab-separated text."
