@@ -83,13 +83,10 @@
   (setf *known-word*
         (block nil (maphash #'(lambda (k v)
                       (if (or (equal response k)
+                              (equal (hira->kata response) k)
                               (equal response v)
                               (equal (concatenate 'string response "する") v))
-                        (return t) nil)) *dict-all*)))
-    (or (notevery #'null
-            (mapcar (lambda (x)
-              (member x (append *all-kana* *all-kanji*) :test 'equal)) (remove-if #'null (list response (hira->kata response)))))
-          *known-word*))
+                        (return t) nil)) *dict-all*))))
 
 (defun correctp (response word)
  "Prompt tail == response head."
